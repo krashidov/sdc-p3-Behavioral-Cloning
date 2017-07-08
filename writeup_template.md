@@ -90,7 +90,7 @@ The final model architecture (model.py lines 18-24) consisted of:
 
 To capture good driving behavior I recorded two laps of myself driving through the center of the lane, followed by another lap where I drove very crookedly. What I mean is that I would oversteer and then correct myself. This lead to my car recovering pretty well, but since the act of oversteering was in the training data, it also lead to my car falling off the road in some specific areas of the track. 
 
-![over-steering][center_2017_07_07_14_59_36_888.jpg]
+[image1]: ./center_2017_07_07_14_59_36_888.jpg "Over Steering"
 
 I then supplemented my training data with recovery turns, where I was on the edge of the road but then I go back to a central driving lane. This helped drastically but then my card would never turn away from the dirt road. So I trained it to steer away from the dirt road like this:
 
