@@ -46,6 +46,8 @@ Using the Udacity provided simulator and my drive.py file, the car can be driven
 python drive.py model.h5
 ```
 
+You can also view the video at run1.mp4
+
 ####3. Submission code is usable and readable
 
 The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
@@ -54,76 +56,66 @@ The model.py file contains the code for training and saving the convolution neur
 
 ####1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
-
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+My model consists of a convolution neural network with 3 layers of 5x5 filter sizes and depths of 32 and 16 with a stride of 2, and one 5x5 layer with a stride of 1 and a depth of 8.  (model.py lines 100-109). I then have 2 layers of 2x2 filter sizes and depths of 4 and 2 with a stride of 1. (model.py 112-117). We then apply max pooling and an initial dropout layer before flattening the network into a fully connected neural network. Here we have 4 fully connected layers, with a dropout layer before a final output node. (model.py 126-141). Each activation is a RELU layer. The data has been normalized and cropped to reduce noise using 2 Keras Lambda layers. (model.py 90-93).
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
-
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+To reduce overfitting, I have two dropout layers. One before flattening and one before outputting the final steering angle. (model.py 123 & 139).
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 144).
 
 ####4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
-
-For details about how I created the training data, see the next section. 
+Training data was chosen to keep the vehicle driving on the road. First, I drove straight around for two laps. Then, I drove as if I was constantly oversteering and then correcting my oversteer. I then supplemented this data with recovery from the dirt patch and recovery from oversteering before the bridge.
 
 ###Model Architecture and Training Strategy
 
 ####1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to at first recreate the NVIDIA self driving neural network(https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/). So I googled "Nvidia architecture in keras" and found this code from the founder of vector ai - https://github.com/andrewraharjo/SDCND_Behavioral_Cloning/blob/master/model.py. This isn't exactly the NVIDIA architecture but it was influenced by it and it adds some interesting layers like dropout and max pooling. The downside is that it is very slow and outputs very many parameters in the convolution layers. It took about 45 minutes to train on my GPU-less laptop. 
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+I then decided to mimick the NVIDIA architecture. This cut down the training time to about 3 minutes, but the model was not ideal. I went back to collect some more training data. This was still not enough. 
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+I then used the left and right images, and flipped those images as well. I also manually appended my training data to include training data where I avoid the dirt patch, and where I correct myself from swerving off the road. For each row of data, I now had 6 data points, the original central image, the left image, the right image, and the flipped of each, which gave me about 160000 training samples. I was convinced that this was enough data. The model was still too simple, so I tweaked the depths a little, by reducing them.
 
-To combat the overfitting, I modified the model so that ...
+At this point I had gotten the model to almost run the entire track, but it clipped a bank during one of the turns. I decided to sacrifice the speed of the training process, by changing the last 5x5 layer stride length from 2 to 1, and change the depths to a sequentially decreasing pattern like andrewraharjo's model. My convolutional depths were 32, 16, 8, and 4. I then had a MaxPooling layer and a 25% dropout layer in between the flattening and another 50% dropout layer at the end of the fully connected neural network. The dropuout and max pooling positions I got from andrewraharjo's code. I tried tweaking the 25% dropout layer to 50% to see what would happen but this only made the model worse. I guess any dropout layer that isn't the penultimate layer works best if it's not 50%. The Max Pooling layer is interesting because it deviates from LeNet's implementation where there was a max pooling layer in between each convolutional layer. 
 
-Then I ... 
+The normalization code was taken straight from the lectures about Lambda layers. I really like the lambda layers because it abstracts away going through each image and manually messing with raw pixel data. 
 
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
+I'm fairly proud of my final model. It took about 12 minutes to train on my laptop all while staying on the track. Although at one point in the video (1:06) it comes dangerously close to moving off the track. I attribute this to faulty training data. When I was recording the "recovery" turning, I sometimes would leave in the recording where I swerved off the road.
 
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
-
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
+The final model architecture (model.py lines 18-24) consisted of:
+* 2 5x5 convolutional layers with a stride of 2x2 
+* 1 5x5 convolution with a stride of 1x  
+* 1 2d max pooling layer with 2x2 pool size, 
+* 1 25% dropout layer 
+* 4 fully connected layers with a penultimate 50% droupout layer.
 
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior I recorded two laps of myself driving through the center of the lane, followed by another lap where I drove very crookedly. What I mean is that I would oversteer and then correct myself. This lead to my car recovering pretty well, but since the act of oversteering was in the training data, it also lead to my car falling off the road in some specific areas of the track. 
 
-![alt text][image2]
+[!over-steering][./data-2/IMG/center_2017_07_07_14_59_36_888.jpg]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+I then supplemented my training data with recovery turns, where I was on the edge of the road but then I go back to a central driving lane. This helped drastically but then my card would never turn away from the dirt road. So I trained it to steer away from the dirt road like this:
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+![dirt-road-sample][./data-2/IMG/center_2017_07_07_15_03_20_716.jpg]
 
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+Not actual sample, but essentially what I did:
+![dirty-road][./recovery-from-dirt.png]
 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
+Other training samples:
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+![left-camera-recovery-from-oversteer][./data-2/IMG/left_2017_07_07_15_00_46_270.jpg]
+![right-camera-oversteer][./IMG/left_2017_07_07_15_00_46_270.jpg]
+
+This resulted in about 160000 image samples, which I was pretty happy about. Please note that data-2 is the good version of the data. The 'data' directory is my attempt to solve the problem with only driving in the center lane. I realized that the network needs to know how to recover otherwise it won't be very safe.
+
+The validation set is 20% of the data set. I used the adam optimizer. 
+
