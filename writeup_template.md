@@ -1,8 +1,8 @@
-#**Behavioral Cloning** 
+**Behavioral Cloning** 
 
-##Writeup Template
+## Writeup Template
 
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
+### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
 
 ---
 
@@ -17,12 +17,12 @@ The goals / steps of this project are the following:
 
 
 ## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
+### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-###Files Submitted & Code Quality
+### Files Submitted & Code Quality
 
-####1. Submission includes all required files and can be used to run the simulator in autonomous mode
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
 * model.py containing the script to create and train the model
@@ -30,7 +30,7 @@ My project includes the following files:
 * model.h5 containing a trained convolution neural network 
 * writeup_report.md or writeup_report.pdf summarizing the results
 
-####2. Submission includes functional code
+#### 2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
 python drive.py model.h5
@@ -38,31 +38,31 @@ python drive.py model.h5
 
 You can also view the video at run1.mp4
 
-####3. Submission code is usable and readable
+#### 3. Submission code is usable and readable
 
 The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. An appropriate model architecture has been employed
+#### 1. An appropriate model architecture has been employed
 
 My model consists of a convolution neural network with 3 layers of 5x5 filter sizes and depths of 32 and 16 with a stride of 2, and one 5x5 layer with a stride of 1 and a depth of 8.  (model.py lines 100-109). I then have 2 layers of 2x2 filter sizes and depths of 4 and 2 with a stride of 1. (model.py 112-117). We then apply max pooling and an initial dropout layer before flattening the network into a fully connected neural network. Here we have 4 fully connected layers, with a dropout layer before a final output node. (model.py 126-141). Each activation is a RELU layer. The data has been normalized and cropped to reduce noise using 2 Keras Lambda layers. (model.py 90-93).
 
-####2. Attempts to reduce overfitting in the model
+#### 2. Attempts to reduce overfitting in the model
 
 To reduce overfitting, I have two dropout layers. One before flattening and one before outputting the final steering angle. (model.py 123 & 139).
 
-####3. Model parameter tuning
+#### 3. Model parameter tuning
 
 The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 144).
 
-####4. Appropriate training data
+#### 4. Appropriate training data
 
 Training data was chosen to keep the vehicle driving on the road. First, I drove straight around for two laps. Then, I drove as if I was constantly oversteering and then correcting my oversteer. I then supplemented this data with recovery from the dirt patch and recovery from oversteering before the bridge.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. Solution Design Approach
+#### 1. Solution Design Approach
 
 The overall strategy for deriving a model architecture was to at first recreate the NVIDIA self driving neural network(https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/). So I googled "Nvidia architecture in keras" and found this code from the founder of vector ai - https://github.com/andrewraharjo/SDCND_Behavioral_Cloning/blob/master/model.py. This isn't exactly the NVIDIA architecture but it was influenced by it and it adds some interesting layers like dropout and max pooling. The downside is that it is very slow and outputs very many parameters in the convolution layers. It took about 45 minutes to train on my GPU-less laptop. 
 
@@ -77,7 +77,7 @@ The normalization code was taken straight from the lectures about Lambda layers.
 I'm fairly proud of my final model. It took about 12 minutes to train on my laptop all while staying on the track. Although at one point in the video (1:06) it comes dangerously close to moving off the track. I attribute this to faulty training data. When I was recording the "recovery" turning, I sometimes would leave in the recording where I swerved off the road.
 
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 The final model architecture (model.py lines 18-24) consisted of:
 * 2 5x5 convolutional layers with a stride of 2x2 
@@ -86,11 +86,11 @@ The final model architecture (model.py lines 18-24) consisted of:
 * 1 25% dropout layer 
 * 4 fully connected layers with a penultimate 50% droupout layer.
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 To capture good driving behavior I recorded two laps of myself driving through the center of the lane, followed by another lap where I drove very crookedly. What I mean is that I would oversteer and then correct myself. This lead to my car recovering pretty well, but since the act of oversteering was in the training data, it also lead to my car falling off the road in some specific areas of the track. 
 
-[!over-steering][./center_2017_07_07_14_59_36_888.jpg]
+![over-steering][./center_2017_07_07_14_59_36_888.jpg]
 
 I then supplemented my training data with recovery turns, where I was on the edge of the road but then I go back to a central driving lane. This helped drastically but then my card would never turn away from the dirt road. So I trained it to steer away from the dirt road like this:
 
