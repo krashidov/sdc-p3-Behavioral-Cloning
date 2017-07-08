@@ -16,16 +16,6 @@ The goals / steps of this project are the following:
 * Summarize the results with a written report
 
 
-[//]: # (Image References)
-
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
-
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
@@ -100,11 +90,11 @@ The final model architecture (model.py lines 18-24) consisted of:
 
 To capture good driving behavior I recorded two laps of myself driving through the center of the lane, followed by another lap where I drove very crookedly. What I mean is that I would oversteer and then correct myself. This lead to my car recovering pretty well, but since the act of oversteering was in the training data, it also lead to my car falling off the road in some specific areas of the track. 
 
-[!over-steering][./data-2/IMG/center_2017_07_07_14_59_36_888.jpg]
+[!over-steering][./center_2017_07_07_14_59_36_888.jpg]
 
 I then supplemented my training data with recovery turns, where I was on the edge of the road but then I go back to a central driving lane. This helped drastically but then my card would never turn away from the dirt road. So I trained it to steer away from the dirt road like this:
 
-![dirt-road-sample][./data-2/IMG/center_2017_07_07_15_03_20_716.jpg]
+![dirt-road-sample][./center_2017_07_07_15_03_20_716.jpg]
 
 Not actual sample, but essentially what I did:
 ![dirty-road][./recovery-from-dirt.png]
@@ -112,8 +102,23 @@ Not actual sample, but essentially what I did:
 
 Other training samples:
 
-![left-camera-recovery-from-oversteer][./data-2/IMG/left_2017_07_07_15_00_46_270.jpg]
-![right-camera-oversteer][./IMG/left_2017_07_07_15_00_46_270.jpg]
+Left camera recovery from oversteer
+![left-camera-recovery-from-oversteer][./left_2017_07_07_15_00_46_270.jpg]
+
+Turning left
+![turning-left][./right_2017_07_07_15_02_17_523.jpg]
+
+Right camera oversteer
+![right-oversteer][./right_2017_07_07_15_03_17_598.jpg]
+
+Avoiding the road
+![left-avoiding-dirt-road][./left_2017_07_07_15_03_20_922.jpg]
+
+Center Oversteer
+![center-oversteer][./center_2017_07_07_14_59_38_448.jpg]
+
+Center
+![center][./center_2017_07_07_14_59_34_853.jpg]
 
 This resulted in about 160000 image samples, which I was pretty happy about. Please note that data-2 is the good version of the data. The 'data' directory is my attempt to solve the problem with only driving in the center lane. I realized that the network needs to know how to recover otherwise it won't be very safe.
 
